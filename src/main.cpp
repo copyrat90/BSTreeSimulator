@@ -12,7 +12,7 @@ void update_draw_frame(void); // Update and Draw one frame
 
 int main()
 {
-    InitWindow(1920, 1080, "Binary Search Tree Simulator");
+    InitWindow(1792, 1008, "Binary Search Tree Simulator");
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(update_draw_frame, 0, 1);

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <vector>
-#include <random>
 
 #include "NodeCircle.hpp"
 
 #include "BSTree.hpp"
+#include "InputBox.hpp"
 
 namespace bs
 {
@@ -22,11 +22,12 @@ public:
 private:
     void redraw_tree();
 
+    void on_number_input(int number);
+
 private:
     BSTree<int, int> _tree;
 
-    std::mt19937 _rand;
-
+    InputBox _input_box;
     std::vector<NodeCircle> _node_circles;
 };
 

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <stdexcept>
 
 namespace bs
 {
@@ -129,6 +130,7 @@ public:
     void clear()
     {
         clear_recurse(_root);
+        _root = nullptr;
         _size = 0;
     }
 
@@ -157,13 +159,10 @@ private:
                 return true;
             }
         }
-        // equal (overwrite)
-        else if (assign)
-        {
+        // equal
+
+        if (assign)
             cur.value = val;
-            return true;
-        }
-        // equal (no-overwrite)
         return false;
     }
 
@@ -177,6 +176,13 @@ private:
         if (greater(key, cur->key))
             return erase_recurse(cur->right, key);
         // equal
+        return erase_node(cur);
+    }
+
+    bool erase_node(Node* cur)
+    {
+        if (!cur)
+            return false;
 
         // 2 children
         if (cur->left && cur->right)
@@ -191,19 +197,15 @@ private:
             cur->value = std::move(right_most->value);
 
             // remove `right_most`
-            Node* right_most_parent = right_most->parent;
-            delete right_most;
-            if (right_most_parent->left == right_most)
-                right_most_parent->left = nullptr;
-            else
-                right_most_parent->right = nullptr;
+            if (!erase_node(right_most))
+                throw std::logic_error("`right_most` should exist, at least `cur->left` exists");
+            return true;
         }
         // 1 or 0 child
         else
         {
             Node* child = (cur->left) ? cur->left : cur->right;
             Node* parent = cur->parent;
-            delete cur;
 
             if (!parent) // `cur` is root
                 _root = child;
@@ -211,6 +213,11 @@ private:
                 parent->left = child;
             else
                 parent->right = child;
+
+            if (child)
+                child->parent = parent;
+
+            delete cur;
         }
 
         _size -= 1;
