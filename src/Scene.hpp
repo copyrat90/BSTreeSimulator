@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <random>
 
 #include "NodeCircle.hpp"
 
@@ -19,7 +20,12 @@ public:
     void render() const;
 
 private:
+    void redraw_tree();
+
+private:
     BSTree<int, int> _tree;
+
+    std::mt19937 _rand;
 
     std::vector<NodeCircle> _node_circles;
 };

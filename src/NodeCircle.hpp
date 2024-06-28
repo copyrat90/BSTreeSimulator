@@ -4,14 +4,15 @@
 #include <raymath.h>
 
 #include <string>
+#include <optional>
 
 namespace bs
 {
 
-struct NodeCircle
+class NodeCircle
 {
 public:
-    NodeCircle(std::string&& key, Vector2 position, float radius, Color color);
+    NodeCircle(int key, std::size_t complete_index, bool red);
 
 public:
     void render() const;
@@ -20,12 +21,13 @@ private:
     float font_size() const;
     float font_spacing() const;
 
-public:
-    std::string key;
+private:
+    std::string _key;
+    std::size_t _complete_index;
 
-    Vector2 position; // center position
-    float radius;
-    Color color;
+    Vector2 _position;
+    std::optional<Vector2> _parent_position;
+    Color _color;
 };
 
 } // namespace bs

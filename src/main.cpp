@@ -5,7 +5,6 @@
 #endif
 
 #include "Scene.hpp"
-#include "constants.hpp"
 
 bs::Scene g_scene;
 
@@ -13,7 +12,7 @@ void update_draw_frame(void); // Update and Draw one frame
 
 int main()
 {
-    InitWindow(bs::WINDOW_WIDTH, bs::WINDOW_HEIGHT, "Binary Search Tree Simulator");
+    InitWindow(1920, 1080, "Binary Search Tree Simulator");
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(update_draw_frame, 0, 1);

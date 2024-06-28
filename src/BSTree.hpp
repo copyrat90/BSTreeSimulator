@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <functional>
 
 namespace bs
@@ -80,37 +81,37 @@ public:
     template <typename Operation>
     void preorder(Operation op)
     {
-        preorder_recurse(_root, op);
+        preorder_recurse(_root, op, 0);
     }
 
     template <typename Operation>
     void preorder(Operation op) const
     {
-        preorder_recurse(_root, op);
+        preorder_recurse(_root, op, 0);
     }
 
     template <typename Operation>
     void inorder(Operation op)
     {
-        inorder_recurse(_root, op);
+        inorder_recurse(_root, op, 0);
     }
 
     template <typename Operation>
     void inorder(Operation op) const
     {
-        inorder_recurse(_root, op);
+        inorder_recurse(_root, op, 0);
     }
 
     template <typename Operation>
     void postorder(Operation op)
     {
-        postorder_recurse(_root, op);
+        postorder_recurse(_root, op, 0);
     }
 
     template <typename Operation>
     void postorder(Operation op) const
     {
-        postorder_recurse(_root, op);
+        postorder_recurse(_root, op, 0);
     }
 
 public:
@@ -244,69 +245,69 @@ private:
 
 private:
     template <typename Operation>
-    void preorder_recurse(Node* cur, Operation op)
+    void preorder_recurse(Node* cur, Operation op, std::size_t complete_index)
     {
         if (!cur)
             return;
 
-        op(cur->key, cur->value);
-        preorder_recurse(cur->left, op);
-        preorder_recurse(cur->right, op);
+        op(cur->key, cur->value, complete_index);
+        preorder_recurse(cur->left, op, complete_index * 2 + 1);
+        preorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
     template <typename Operation>
-    void preorder_recurse(Node* cur, Operation op) const
+    void preorder_recurse(Node* cur, Operation op, std::size_t complete_index) const
     {
         if (!cur)
             return;
 
-        op(cur->key, cur->value);
-        preorder_recurse(cur->left, op);
-        preorder_recurse(cur->right, op);
+        op(cur->key, cur->value, complete_index);
+        preorder_recurse(cur->left, op, complete_index * 2 + 1);
+        preorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
     template <typename Operation>
-    void inorder_recurse(Node* cur, Operation op)
+    void inorder_recurse(Node* cur, Operation op, std::size_t complete_index)
     {
         if (!cur)
             return;
 
-        inorder_recurse(cur->left, op);
-        op(cur->key, cur->value);
-        inorder_recurse(cur->right, op);
+        inorder_recurse(cur->left, op, complete_index * 2 + 1);
+        op(cur->key, cur->value, complete_index);
+        inorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
     template <typename Operation>
-    void inorder_recurse(Node* cur, Operation op) const
+    void inorder_recurse(Node* cur, Operation op, std::size_t complete_index) const
     {
         if (!cur)
             return;
 
-        inorder_recurse(cur->left, op);
-        op(cur->key, cur->value);
-        inorder_recurse(cur->right, op);
+        inorder_recurse(cur->left, op, complete_index * 2 + 1);
+        op(cur->key, cur->value, complete_index);
+        inorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
     template <typename Operation>
-    void postorder_recurse(Node* cur, Operation op)
+    void postorder_recurse(Node* cur, Operation op, std::size_t complete_index)
     {
         if (!cur)
             return;
 
-        postorder_recurse(cur->left, op);
-        postorder_recurse(cur->right, op);
-        op(cur->key, cur->value);
+        postorder_recurse(cur->left, op, complete_index * 2 + 1);
+        postorder_recurse(cur->right, op, complete_index * 2 + 2);
+        op(cur->key, cur->value, complete_index);
     }
 
     template <typename Operation>
-    void postorder_recurse(Node* cur, Operation op) const
+    void postorder_recurse(Node* cur, Operation op, std::size_t complete_index) const
     {
         if (!cur)
             return;
 
-        postorder_recurse(cur->left, op);
-        postorder_recurse(cur->right, op);
-        op(cur->key, cur->value);
+        postorder_recurse(cur->left, op, complete_index * 2 + 1);
+        postorder_recurse(cur->right, op, complete_index * 2 + 2);
+        op(cur->key, cur->value, complete_index);
     }
 
     void clear_recurse(Node* cur)
@@ -336,7 +337,7 @@ private:
     }
 
 private:
-    size_t _size = 0;
+    std::size_t _size = 0;
 
     Node* _root = nullptr;
 };

@@ -3,27 +3,34 @@
 namespace bs
 {
 
-Scene::Scene()
+Scene::Scene() : _rand(std::random_device{}())
 {
-    // test
-    static constexpr float RADIUS = 50;
-    _node_circles.emplace_back("root", Vector2{500, 100}, RADIUS, BLACK);
-    _node_circles.emplace_back("left_sub", Vector2{300, 200}, RADIUS, RED);
-    _node_circles.emplace_back("right_sub", Vector2{700, 200}, RADIUS, RED);
-    _node_circles.emplace_back("1", Vector2{200, 300}, RADIUS, BLACK);
-    _node_circles.emplace_back("2", Vector2{400, 300}, RADIUS, BLACK);
-    _node_circles.emplace_back("3", Vector2{600, 300}, RADIUS, BLACK);
-    _node_circles.emplace_back("4", Vector2{800, 300}, RADIUS, BLACK);
 }
 
 void Scene::update()
 {
+    if (IsKeyPressed(KEY_Z))
+    {
+        std::uniform_int_distribution<int> dist(0, 10000);
+        const int key = dist(_rand);
+        _tree.insert(key, key);
+        redraw_tree();
+    }
 }
 
 void Scene::render() const
 {
     for (const auto& circle : _node_circles)
         circle.render();
+}
+
+void Scene::redraw_tree()
+{
+    _node_circles.clear();
+
+    _tree.postorder([this](int key, [[maybe_unused]] int val, std::size_t complete_index) {
+        _node_circles.emplace_back(key, complete_index, false);
+    });
 }
 
 } // namespace bs
