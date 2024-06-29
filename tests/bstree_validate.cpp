@@ -88,7 +88,7 @@ std::ostream& operator<<(std::ostream& os, const ReproduceInfo& repro)
     return os;
 }
 
-bool test(unsigned seed);
+bool worker(unsigned seed);
 bool validate(unsigned seed, int idx, const bs::BSTree<int, int>&, const std::map<int, int>&, const ReproduceInfo&);
 
 int main()
@@ -111,7 +111,7 @@ int main()
     std::random_device rd;
 
     for (unsigned i = 0; i < cores; ++i)
-        futures.push_back(std::async(std::launch::async, test, rd()));
+        futures.push_back(std::async(std::launch::async, worker, rd()));
 
     for (unsigned i = 0; i < cores; ++i)
         results.push_back(futures[i].get());
@@ -122,9 +122,14 @@ int main()
     return 0;
 }
 
-bool test(unsigned seed)
+bool worker(unsigned seed)
 {
-    std::cout << std::format("TID #{}: seed={}\n", std::this_thread::get_id(), seed);
+    // print current thread & seed info
+    {
+        std::ostringstream worker_info;
+        worker_info << "TID #" << std::this_thread::get_id() << ": seed=" << seed << "\n";
+        std::cout << worker_info.str();
+    }
 
     int idx = -1;
 
