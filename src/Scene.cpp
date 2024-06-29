@@ -24,8 +24,8 @@ void Scene::redraw_tree()
 {
     _node_circles.clear();
 
-    _tree.postorder([this](int key, [[maybe_unused]] int val, std::size_t complete_index) {
-        _node_circles.emplace_back(key, complete_index, true);
+    _tree.postorder([this](int key, [[maybe_unused]] int val, const bs::TraversalInfo& info) {
+        _node_circles.emplace_back(key, info.complete_index, info.red);
     });
 }
 

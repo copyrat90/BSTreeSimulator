@@ -119,6 +119,7 @@ int main()
     if (!std::ranges::all_of(results, [](const bool val) { return val; }))
         return -1;
 
+    std::cout << "Test succeeded!\n";
     return 0;
 }
 
@@ -210,7 +211,7 @@ bool validate(unsigned seed, int idx, const bs::BSTree<int, int>& t, const std::
     t_res.reserve(t.size());
     m_res.reserve(m.size());
 
-    t.inorder([&t_res]([[maybe_unused]] int key, int val, [[maybe_unused]] std::size_t complete_index) {
+    t.inorder([&t_res]([[maybe_unused]] int key, int val, [[maybe_unused]] const bs::TraversalInfo& info) {
         t_res.push_back(val);
     });
 

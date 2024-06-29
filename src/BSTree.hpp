@@ -4,6 +4,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "TraversalInfo.hpp"
+
 namespace bs
 {
 
@@ -257,7 +259,11 @@ private:
         if (!cur)
             return;
 
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
         preorder_recurse(cur->left, op, complete_index * 2 + 1);
         preorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
@@ -268,7 +274,11 @@ private:
         if (!cur)
             return;
 
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
         preorder_recurse(cur->left, op, complete_index * 2 + 1);
         preorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
@@ -280,7 +290,11 @@ private:
             return;
 
         inorder_recurse(cur->left, op, complete_index * 2 + 1);
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
         inorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
@@ -291,7 +305,11 @@ private:
             return;
 
         inorder_recurse(cur->left, op, complete_index * 2 + 1);
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
         inorder_recurse(cur->right, op, complete_index * 2 + 2);
     }
 
@@ -303,7 +321,11 @@ private:
 
         postorder_recurse(cur->left, op, complete_index * 2 + 1);
         postorder_recurse(cur->right, op, complete_index * 2 + 2);
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
     }
 
     template <typename Operation>
@@ -314,7 +336,11 @@ private:
 
         postorder_recurse(cur->left, op, complete_index * 2 + 1);
         postorder_recurse(cur->right, op, complete_index * 2 + 2);
-        op(cur->key, cur->value, complete_index);
+        op(cur->key, cur->value,
+           TraversalInfo{
+               .complete_index = complete_index,
+               .red = true,
+           });
     }
 
     void clear_recurse(Node* cur)
