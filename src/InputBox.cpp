@@ -16,7 +16,7 @@ InputBox::InputBox(Vector2 position, std::function<void(int)> input_callback)
 void InputBox::update()
 {
     int unicode_char;
-    while (unicode_char = GetCharPressed())
+    while ((unicode_char = GetCharPressed()))
     {
         if (_str.size() >= 9)
             continue;
