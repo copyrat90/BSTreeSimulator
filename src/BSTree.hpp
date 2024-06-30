@@ -31,30 +31,42 @@ public:
 
 public:
     // Doesn't insert if same key present
-    bool insert(const Key& key, const Value& val)
+    template <typename TKey, typename... TValArgs>
+    bool insert(TKey&& key, TValArgs&&... val_args)
     {
         if (!_root)
         {
-            _root = new Node{.key = key, .value = val, .parent = nullptr};
+            _root = new Node{
+                .key = std::forward<TKey>(key),
+                .value = Value(std::forward<TValArgs>(val_args)...),
+                .parent = nullptr,
+            };
             _size += 1;
             return true;
         }
 
-        const bool inserted = insert_recurse(*_root, key, val, false);
+        const bool inserted =
+            insert_recurse(*_root, false, std::forward<TKey>(key), std::forward<TValArgs>(val_args)...);
         return inserted;
     }
 
     // Overwrite if same key present
-    bool insert_or_assign(const Key& key, const Value& val)
+    template <typename TKey, typename... TValArgs>
+    bool insert_or_assign(TKey&& key, TValArgs&&... val_args)
     {
         if (!_root)
         {
-            _root = new Node{.key = key, .value = val, .parent = nullptr};
+            _root = new Node{
+                .key = std::forward<TKey>(key),
+                .value = Value(std::forward<TValArgs>(val_args)...),
+                .parent = nullptr,
+            };
             _size += 1;
             return true;
         }
 
-        const bool inserted = insert_recurse(*_root, key, val, true);
+        const bool inserted =
+            insert_recurse(*_root, true, std::forward<TKey>(key), std::forward<TValArgs>(val_args)...);
         return inserted;
     }
 
@@ -137,15 +149,20 @@ public:
     }
 
 private:
-    bool insert_recurse(Node& cur, const Key& key, const Value& val, const bool assign)
+    template <typename TKey, typename... TValArgs>
+    bool insert_recurse(Node& cur, const bool assign, TKey&& key, TValArgs&&... val_args)
     {
         if (less(key, cur.key))
         {
             if (cur.left)
-                return insert_recurse(*cur.left, key, val, assign);
+                return insert_recurse(*cur.left, assign, std::forward<TKey>(key), std::forward<TValArgs>(val_args)...);
             else
             {
-                cur.left = new Node{.key = key, .value = val, .parent = &cur};
+                cur.left = new Node{
+                    .key = std::forward<TKey>(key),
+                    .value = Value(std::forward<TValArgs>(val_args)...),
+                    .parent = &cur,
+                };
                 _size += 1;
                 return true;
             }
@@ -153,10 +170,14 @@ private:
         else if (greater(key, cur.key))
         {
             if (cur.right)
-                return insert_recurse(*cur.right, key, val, assign);
+                return insert_recurse(*cur.right, assign, std::forward<TKey>(key), std::forward<TValArgs>(val_args)...);
             else
             {
-                cur.right = new Node{.key = key, .value = val, .parent = &cur};
+                cur.right = new Node{
+                    .key = std::forward<TKey>(key),
+                    .value = Value(std::forward<TValArgs>(val_args)...),
+                    .parent = &cur,
+                };
                 _size += 1;
                 return true;
             }
@@ -164,7 +185,7 @@ private:
         // equal
 
         if (assign)
-            cur.value = val;
+            cur.value = Value(std::forward<TValArgs>(val_args)...);
         return false;
     }
 
