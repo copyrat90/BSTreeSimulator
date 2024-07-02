@@ -1,9 +1,18 @@
 #include "Scene.hpp"
 
+#include <format>
+
 namespace bs
 {
 
-Scene::Scene() : _input_box({100, 50}, [this](int num) { on_number_input(num); })
+namespace
+{
+constexpr const char* BLACK_DEPTH_FMT = "black depth: {}";
+}
+
+Scene::Scene()
+    : _black_depth_str(std::format(BLACK_DEPTH_FMT, _tree.black_depth())),
+      _input_box({100, 50}, [this](int num) { on_number_input(num); })
 {
 }
 
@@ -18,6 +27,7 @@ void Scene::render() const
         circle.render();
 
     _input_box.render();
+    DrawText(_black_depth_str.c_str(), 100, 110, 30, BLACK);
 }
 
 void Scene::redraw_tree()
@@ -27,6 +37,8 @@ void Scene::redraw_tree()
     _tree.postorder([this](int key, [[maybe_unused]] int val, const bs::TraversalInfo& info) {
         _node_circles.emplace_back(key, info.complete_index, info.red);
     });
+
+    _black_depth_str = std::format(BLACK_DEPTH_FMT, _tree.black_depth());
 }
 
 void Scene::on_number_input(int number)

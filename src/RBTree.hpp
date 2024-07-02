@@ -643,6 +643,62 @@ private:
         return !less(k1, k2) && !greater(k1, k2);
     }
 
+public:
+    int black_depth() const
+    {
+        return black_depth_recurse(*_root, 0);
+    }
+
+    bool validate() const
+    {
+        if (_root->red || get_nil().red)
+            return false;
+        if (!validate_no_double_red(*_root))
+            return false;
+        if (black_depth() < 0)
+            return false;
+
+        return true;
+    }
+
+private:
+    bool validate_no_double_red(const Node& cur) const
+    {
+        if (is_nil(cur))
+            return true;
+
+        if (cur.red && (cur.left->red || cur.right->red))
+            return false;
+
+        if (!validate_no_double_red(*cur.left))
+            return false;
+        if (!validate_no_double_red(*cur.right))
+            return false;
+
+        return true;
+    }
+
+    int black_depth_recurse(const Node& cur, int black_depth) const
+    {
+        if (is_nil(cur))
+            return black_depth;
+
+        black_depth += !cur.red;
+
+        const int left_black_depth = black_depth_recurse(*cur.left, black_depth);
+        if (left_black_depth < 0)
+            return -1;
+
+        const int right_black_depth = black_depth_recurse(*cur.right, black_depth);
+        if (right_black_depth < 0)
+            return -1;
+
+        if (left_black_depth != right_black_depth)
+            return -1;
+
+        return left_black_depth;
+    }
+
 private:
     std::size_t _size = 0;
 

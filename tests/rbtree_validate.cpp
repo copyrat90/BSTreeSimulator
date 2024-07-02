@@ -207,6 +207,8 @@ bool validate(unsigned seed, int idx, const bs::RBTree<int, int>& t, const std::
     TEST_ASSERT(t.empty() == m.empty(), repro);
     TEST_ASSERT(t.size() == m.size(), "\t", t.size(), " - ", m.size(), "\n", repro);
 
+    TEST_ASSERT(t.validate());
+
     std::vector<int> t_res, m_res;
     t_res.reserve(t.size());
     m_res.reserve(m.size());

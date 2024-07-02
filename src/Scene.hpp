@@ -4,8 +4,8 @@
 
 #include "NodeCircle.hpp"
 
-#include "RBTree.hpp"
 #include "InputBox.hpp"
+#include "RBTree.hpp"
 
 namespace bs
 {
@@ -26,6 +26,7 @@ private:
 
 private:
     RBTree<int, int> _tree;
+    std::string _black_depth_str;
 
     InputBox _input_box;
     std::vector<NodeCircle> _node_circles;
