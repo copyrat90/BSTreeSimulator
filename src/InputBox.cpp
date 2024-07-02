@@ -45,7 +45,7 @@ void InputBox::render() const
 
     DrawRectangleRec(bg_box, RAYWHITE);
 
-    DrawTextEx(GetFontDefault(), (_str.empty() ? "Type..." : _str.c_str()), _position, 40, 4,
+    DrawTextEx(GetFontDefault(), (_str.empty() ? "Number..." : _str.c_str()), _position, 40, 4,
                (_str.empty() ? LIGHTGRAY : BLACK));
 
     DrawRectangleLinesEx(bg_box, 1, BLACK);

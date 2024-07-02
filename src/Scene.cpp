@@ -8,11 +8,13 @@ namespace bs
 namespace
 {
 constexpr const char* BLACK_DEPTH_FMT = "black depth: {}";
-}
+constexpr const char* VALID_FMT = "valid: {}";
+} // namespace
 
 Scene::Scene()
-    : _black_depth_str(std::format(BLACK_DEPTH_FMT, _tree.black_depth())),
-      _input_box({100, 50}, [this](int num) { on_number_input(num); })
+    : _black_depth(_tree.black_depth()), _valid(_tree.validate()),
+      _black_depth_str(std::format(BLACK_DEPTH_FMT, _black_depth)), _valid_str(std::format(VALID_FMT, _valid)),
+      _input_box({80, 50}, [this](int num) { on_number_input(num); })
 {
 }
 
@@ -27,7 +29,9 @@ void Scene::render() const
         circle.render();
 
     _input_box.render();
-    DrawText(_black_depth_str.c_str(), 100, 110, 30, BLACK);
+
+    DrawText(_black_depth_str.c_str(), 80, 110, 30, (_black_depth >= 0 ? BLACK : RED));
+    DrawText(_valid_str.c_str(), 80, 150, 30, (_valid ? BLACK : RED));
 }
 
 void Scene::redraw_tree()
@@ -38,7 +42,11 @@ void Scene::redraw_tree()
         _node_circles.emplace_back(key, info.complete_index, info.red);
     });
 
-    _black_depth_str = std::format(BLACK_DEPTH_FMT, _tree.black_depth());
+    _black_depth = _tree.black_depth();
+    _valid = _tree.validate();
+
+    _black_depth_str = std::format(BLACK_DEPTH_FMT, _black_depth);
+    _valid_str = std::format(VALID_FMT, _valid);
 }
 
 void Scene::on_number_input(int number)
