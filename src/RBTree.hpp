@@ -266,8 +266,11 @@ private:
             else
                 parent.right = &child;
 
-            if (!is_nil(child))
-                child.parent = &parent;
+            // set this even if `child` is nil
+            child.parent = &parent;
+
+            if (!cur.red)
+                rebalance_erase(child);
 
             delete &cur;
         }
@@ -473,6 +476,86 @@ private:
             throw std::logic_error("Should not reach here");
     }
 
+    /// @param child starts with erased node's child
+    void rebalance_erase(Node& child)
+    {
+        // 0. if root, recolor it to black
+        if (&child == _root)
+        {
+            child.red = false;
+            return;
+        }
+
+        Node& parent = *child.parent;
+
+        const bool child_is_left = (&child == parent.left);
+        Node& sibling = child_is_left ? *parent.right : *parent.left;
+
+        // 1. child: red
+        if (child.red)
+        {
+            child.red = false;
+            return;
+        }
+        // 2. child: black, sibling: red
+        if (sibling.red)
+        {
+            sibling.red = false;
+            parent.red = true;
+
+            if (child_is_left)
+                rotate_left(parent);
+            else
+                rotate_right(parent);
+
+            rebalance_erase(child);
+        }
+        // 3. child: black, sibling: black, sib_left: black, sib_right: black
+        else if (!sibling.left->red && !sibling.right->red)
+        {
+            sibling.red = true;
+
+            rebalance_erase(parent);
+        }
+        // 4. child: black, sibling: black, sib_left: red, sib_right: black
+        else if ((child_is_left && (sibling.left->red && !sibling.right->red)) ||
+                 (!child_is_left && (sibling.right->red && !sibling.left->red)))
+        {
+            sibling.red = true;
+
+            if (child_is_left)
+            {
+                sibling.left->red = false;
+                rotate_right(sibling);
+            }
+            else
+            {
+                sibling.right->red = false;
+                rotate_left(sibling);
+            }
+
+            rebalance_erase(child);
+        }
+        // 5. child: black, sibling: black, sib_left: ?, sib_right: red
+        else if ((child_is_left && sibling.right->red) || (!child_is_left && sibling.left->red))
+        {
+            std::swap(parent.red, sibling.red);
+
+            if (child_is_left)
+            {
+                sibling.right->red = false;
+                rotate_left(parent);
+            }
+            else
+            {
+                sibling.left->red = false;
+                rotate_right(parent);
+            }
+        }
+        else
+            throw std::logic_error("Should not reach here");
+    }
+
 private:
     void rotate_left(Node& cur)
     {
@@ -510,7 +593,7 @@ private:
         assert(!is_nil(left));
 
         cur.left = left.right;
-        if (left.right)
+        if (!is_nil(*left.right))
             left.right->parent = &cur;
 
         cur.parent = &left;
@@ -518,6 +601,8 @@ private:
 
         left.parent = &parent;
         if (is_nil(parent))
+            _root = &left;
+        else
         {
             if (parent.right == &cur)
                 parent.right = &left;

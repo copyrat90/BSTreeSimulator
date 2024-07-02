@@ -4,7 +4,7 @@
 
 #include "NodeCircle.hpp"
 
-#include "BSTree.hpp"
+#include "RBTree.hpp"
 #include "InputBox.hpp"
 
 namespace bs
@@ -25,7 +25,7 @@ private:
     void on_number_input(int number);
 
 private:
-    BSTree<int, int> _tree;
+    RBTree<int, int> _tree;
 
     InputBox _input_box;
     std::vector<NodeCircle> _node_circles;
