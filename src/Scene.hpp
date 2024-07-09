@@ -1,40 +1,35 @@
 #pragma once
 
-#include <vector>
-
-#include "NodeCircle.hpp"
-
-#include "InputBox.hpp"
-#include "RBTree.hpp"
+#include <optional>
 
 namespace bs
 {
 
-class Scene final
+enum class SceneType;
+
+class Scene
 {
 public:
-    Scene();
+    virtual ~Scene() = default;
+
+    Scene(SceneType type) : _type(type)
+    {
+    }
 
 public:
-    void update();
-    void render() const;
+    /// @return next scene type if scene change requested
+    virtual auto update() -> std::optional<SceneType> = 0;
+
+    virtual void render() const = 0;
+
+public:
+    auto get_scene_type() const -> SceneType
+    {
+        return _type;
+    }
 
 private:
-    void redraw_tree();
-
-    void on_number_input(int number);
-
-private:
-    RBTree<int, int> _tree;
-
-    int _black_depth;
-    bool _valid;
-
-    std::string _black_depth_str;
-    std::string _valid_str;
-
-    InputBox _input_box;
-    std::vector<NodeCircle> _node_circles;
+    SceneType _type;
 };
 
 } // namespace bs

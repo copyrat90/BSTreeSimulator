@@ -1,5 +1,7 @@
 #include "InputBox.hpp"
 
+#include <stdexcept>
+
 namespace bs
 {
 
@@ -20,16 +22,27 @@ void InputBox::update()
     {
         if (_str.size() >= 9)
             continue;
-        if (!('0' <= unicode_char && unicode_char <= '9'))
-            continue;
-
-        _str.push_back((char)unicode_char);
+        else if (unicode_char == '-')
+        {
+            if (_str.empty())
+                _str.push_back('-');
+        }
+        else if ('0' <= unicode_char && unicode_char <= '9')
+            _str.push_back((char)unicode_char);
     }
 
     if (IsKeyPressed(KEY_ENTER) && !_str.empty())
     {
-        const int num = std::stoi(_str);
-        _input_callback(num);
+        try
+        {
+            const int num = std::stoi(_str);
+            _input_callback(num);
+        }
+        catch (const std::invalid_argument&)
+        {
+            // do nothing
+        }
+
         _str.clear();
     }
 

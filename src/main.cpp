@@ -4,15 +4,23 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#include "Scene.hpp"
+#include <format>
+#include <memory>
+#include <stdexcept>
 
-bs::Scene g_scene;
+#include "AlterBinaryHeapScene.hpp"
+#include "BSTreeScene.hpp"
+#include "SceneType.hpp"
+
+std::unique_ptr<bs::Scene> g_scene;
 
 void update_draw_frame(void); // Update and Draw one frame
 
 int main()
 {
     InitWindow(1792, 1008, "Binary Search Tree Simulator");
+
+    g_scene.reset(new bs::BSTreeScene);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(update_draw_frame, 0, 1);
@@ -33,13 +41,31 @@ int main()
 
 void update_draw_frame(void)
 {
-    g_scene.update();
+    const auto next_scene = g_scene->update();
 
     BeginDrawing();
     {
         ClearBackground(LIGHTGRAY);
-        g_scene.render();
+        g_scene->render();
         DrawFPS(10, 10);
     }
     EndDrawing();
+
+    if (next_scene.has_value())
+    {
+        switch (next_scene.value())
+        {
+        case bs::SceneType::BSTREE:
+            g_scene.reset();
+            g_scene.reset(new bs::BSTreeScene);
+            break;
+        case bs::SceneType::ALTER_BINARY_HEAP:
+            g_scene.reset();
+            g_scene.reset(new bs::AlterBinaryHeapScene);
+            break;
+
+        default:
+            throw std::logic_error(std::format("Invalid scene type={}", (int)next_scene.value()));
+        }
+    }
 }

@@ -61,6 +61,7 @@ else()
     add_subdirectory(tests/)
     add_test(NAME test_bstree COMMAND bstree_validate)
     add_test(NAME test_rbtree COMMAND rbtree_validate)
+    add_test(NAME test_bheap COMMAND bheap_validate)
 endif()
 
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)

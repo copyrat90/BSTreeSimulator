@@ -31,7 +31,16 @@ auto complete_index_to_position(std::size_t complete_index) -> Vector2
 
 NodeCircle::NodeCircle(int key, std::size_t complete_index, bool red)
     : _key(std::to_string(key)), _complete_index(complete_index), _position(complete_index_to_position(complete_index)),
-      _color(red ? RED : BLACK)
+      _red(red)
+{
+    // only calculate parent position when not root
+    if (complete_index != 0)
+        _parent_position = complete_index_to_position((complete_index + 1) / 2 - 1);
+}
+
+NodeCircle::NodeCircle(int key, int id, std::size_t complete_index, bool red)
+    : _key(std::to_string(key)), _id(std::to_string(id)), _complete_index(complete_index),
+      _position(complete_index_to_position(complete_index)), _red(red)
 {
     // only calculate parent position when not root
     if (complete_index != 0)
@@ -42,12 +51,26 @@ void NodeCircle::render() const
 {
     if (_parent_position)
         DrawLineEx(*_parent_position, _position, LINE_THICKNESS, BLACK);
-    DrawCircle((int)std::round(_position.x), (int)std::round(_position.y), RADIUS, _color);
+    DrawCircle((int)std::round(_position.x), (int)std::round(_position.y), RADIUS, (_red ? RED : BLACK));
 
     const auto text_scale = MeasureTextEx(GetFontDefault(), _key.c_str(), font_size(), font_spacing());
     const auto center_pos = Vector2Add(_position, Vector2Scale(text_scale, -0.5f));
 
     DrawTextEx(GetFontDefault(), _key.c_str(), center_pos, font_size(), font_spacing(), WHITE);
+
+    if (!_id.empty())
+        DrawTextEx(GetFontDefault(), _id.c_str(), Vector2Add(center_pos, Vector2{-1.5 * RADIUS, -1.5 * RADIUS}),
+                   font_size(), font_spacing(), BLACK);
+}
+
+bool NodeCircle::is_red() const
+{
+    return _red;
+}
+
+void NodeCircle::set_red(bool red)
+{
+    _red = red;
 }
 
 float NodeCircle::font_size() const
