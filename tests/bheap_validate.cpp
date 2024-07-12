@@ -177,7 +177,7 @@ bool worker(unsigned seed)
 
             std::uniform_int_distribution<std::size_t> select_range(0, h.size() - 1);
             const std::size_t selected_idx = select_range(rand);
-            const int selected_id = h.internal_vector()[selected_idx]->value.id;
+            const int selected_id = h.begin()[selected_idx].id;
 
             const int num = all_int_range(rand);
             repro.commands.emplace_back(Command::UPDATE, num, selected_id);

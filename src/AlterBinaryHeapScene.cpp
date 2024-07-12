@@ -55,10 +55,10 @@ void AlterBinaryHeapScene::redraw_tree()
 {
     _node_circles.clear();
 
-    for (int i = _heap.internal_vector().size() - 1; i >= 0; --i)
+    for (int heap_idx = _heap.size() - 1; heap_idx >= 0; --heap_idx)
     {
-        const auto* node = _heap.internal_vector()[i];
-        _node_circles.emplace_back(node->value.priority, node->value.id, node->heap_index, _selected_id == node->value.id);
+        const auto& data = _heap.begin()[heap_idx];
+        _node_circles.emplace_back(data.priority, data.id, heap_idx, _selected_id == data.id);
     }
 
     _valid = _heap.validate();
@@ -76,10 +76,10 @@ void AlterBinaryHeapScene::on_number_input(int number)
             _selected_id = 0;
         }
 
-        const auto it = _heap.internal_map().find(number);
+        const auto it = _heap.find(number);
 
         // select new selection
-        if (it != _heap.internal_map().cend())
+        if (it != _heap.cend())
         {
             _selected_id = number;
         }

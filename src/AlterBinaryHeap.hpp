@@ -30,8 +30,7 @@ public:
 
     using UniqueId = std::invoke_result_t<decltype(&T::unique_id), T>;
 
-    // private:
-public:
+private:
     struct Node
     {
         T value;
@@ -47,6 +46,106 @@ public:
                 return std::weak_ordering::greater;
 
             return std::weak_ordering::equivalent;
+        }
+    };
+
+public:
+    /// @brief Random Access Iterator
+    struct ConstIterator
+    {
+        friend class AlterBinaryHeap;
+
+    private:
+        const std::vector<Node*>& _heap;
+        std::size_t _heap_index;
+
+    private:
+        auto node() const -> const Node&
+        {
+            return *_heap[_heap_index];
+        }
+
+    public:
+        ConstIterator(const std::vector<Node*>& heap, std::size_t heap_index) : _heap(heap), _heap_index(heap_index)
+        {
+        }
+
+        auto operator*() const -> const T&
+        {
+            return node()->value;
+        }
+
+        auto operator->() const -> const T*
+        {
+            return &node()->value;
+        }
+
+        auto operator[](std::ptrdiff_t index) const -> const T&
+        {
+            return _heap[_heap_index + index]->value;
+        }
+
+        auto operator-(const ConstIterator& other) const -> std::ptrdiff_t
+        {
+            return _heap_index - other._heap_index;
+        }
+
+        bool operator==(const ConstIterator& other) const
+        {
+            return _heap_index == other._heap_index;
+        }
+
+        auto operator<=>(const ConstIterator& other) const
+        {
+            return _heap_index <=> other._heap_index;
+        }
+
+        auto operator+(std::ptrdiff_t diff) const -> ConstIterator
+        {
+            return ConstIterator(_heap, _heap_index + diff);
+        }
+
+        auto operator+=(std::ptrdiff_t diff) -> ConstIterator&
+        {
+            _heap_index += diff;
+            return *this;
+        }
+
+        auto operator-(std::ptrdiff_t diff) const -> ConstIterator
+        {
+            return ConstIterator(_heap, _heap_index - diff);
+        }
+
+        auto operator-=(std::ptrdiff_t diff) -> ConstIterator&
+        {
+            _heap_index -= diff;
+            return *this;
+        }
+
+        auto operator++() -> ConstIterator&
+        {
+            ++_heap_index;
+            return *this;
+        }
+
+        auto operator++(int) -> ConstIterator
+        {
+            auto it = *this;
+            operator++();
+            return it;
+        }
+
+        auto operator--() -> ConstIterator&
+        {
+            --_heap_index;
+            return *this;
+        }
+
+        auto operator--(int) -> ConstIterator
+        {
+            auto it = *this;
+            operator--();
+            return it;
         }
     };
 
@@ -91,12 +190,43 @@ public: // Modifiers
     {
         elem_swap(0, size() - 1);
 
-        const bool erased = _map.erase(_heap.back()->value.unique_id());
+        [[maybe_unused]] const bool erased = _map.erase(_heap.back()->value.unique_id());
         assert(erased);
         _heap.pop_back();
 
         if (!empty())
             bubble_down(0);
+    }
+
+public: // Iterators
+    auto cbegin() const noexcept -> ConstIterator
+    {
+        return ConstIterator(_heap, 0);
+    }
+
+    auto begin() const noexcept -> ConstIterator
+    {
+        return cbegin();
+    }
+
+    auto cend() const noexcept -> ConstIterator
+    {
+        return ConstIterator(_heap, size());
+    }
+
+    auto end() const noexcept -> ConstIterator
+    {
+        return cend();
+    }
+
+public: // Lookup
+    auto find(const UniqueId& id) const -> ConstIterator
+    {
+        const auto it = _map.find(id);
+        if (it != _map.cend())
+            return ConstIterator(_heap, it->second.heap_index);
+
+        return cend();
     }
 
 private:
@@ -264,17 +394,6 @@ public:
     bool validate() const
     {
         return std::ranges::is_heap(_heap, [](const Node* left, const Node* right) { return *left < *right; });
-    }
-
-public:
-    auto internal_vector() const -> const std::vector<Node*>&
-    {
-        return _heap;
-    }
-
-    auto internal_map() const -> const std::unordered_map<UniqueId, Node, UniqueIdHash, UniqueIdEqual>&
-    {
-        return _map;
     }
 
 private:
